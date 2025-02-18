@@ -1,4 +1,49 @@
-import { Controller } from '@nestjs/common';
+// src/agents/agents.controller.ts
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
+import { AgentsService } from './agents.service';
+import { CreateAgentDto } from './dto/create-agent.dto';
+import { Agent } from './agent.entity';
+import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
 
 @Controller('agents')
-export class AgentsController {}
+export class AgentsController {
+  constructor(private readonly agentsService: AgentsService) {}
+
+  @UseGuards(JwtAuthGuard) // if you want to create agent, need to log in.
+  @Post()
+  async create(@Body() dto: CreateAgentDto): Promise<Agent> {
+    return this.agentsService.createAgent(dto);
+  }
+
+  // get all the agents, no need to log in.
+  @Get()
+  async findAll(): Promise<Agent[]> {
+    return this.agentsService.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: number): Promise<Agent | null> {
+    return this.agentsService.findOne(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(@Param('id') id: number, @Body() body: Partial<Agent>) {
+    return this.agentsService.updateAgent(+id, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async remove(@Param('id') id: number) {
+    return this.agentsService.deleteAgent(+id);
+  }
+}
