@@ -18,10 +18,7 @@ export class Agent {
   })
   prompt: string;
 
-  @Column({
-    type: 'enum',
-    enum: AgentType,
-    default: AgentType.WORKER,
-  })
+  // alterative method since SQLite does not support enum
+  @Column({ type: 'varchar', length: 10 })
   type: AgentType;
 }
